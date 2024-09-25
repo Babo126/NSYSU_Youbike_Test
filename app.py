@@ -22,10 +22,12 @@ def home():
         if station['PredictedAvailableBikes'] < threshold:
             # 還缺的車輛數量
             bike_shortage = int(threshold - station['PredictedAvailableBikes'])
-            filtered_stations.append({
-                'StationName': station['StationName'],
-                'BikeShortage': bike_shortage
-            })
+            # 檢查 bike_shortage 是否大於 0，避免顯示還缺 0 台車的情況
+            if bike_shortage > 0:
+                filtered_stations.append({
+                    'StationName': station['StationName'],
+                    'BikeShortage': bike_shortage
+                })
 
     # 獲取當前時間
     current_time = datetime.now().strftime('%m/%d %H:%M')
@@ -34,4 +36,6 @@ def home():
     return render_template('index.html', stations=filtered_stations, current_time=current_time)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))  # 從環境變量中獲取端口號，如果沒有則默認5000
+    app.run(host='0.0.0.0', port=port)  # 監聽所有 IP 並在指定端口上運行
+    
